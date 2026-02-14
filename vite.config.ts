@@ -1,23 +1,26 @@
 import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
-    return {
-      server: {
-        port: 3000,
-        host: '0.0.0.0',
-      },
-      plugins: [react()],
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
-      resolve: {
-        alias: {
-          '@': path.resolve(__dirname, '.'),
-        }
-      }
-    };
+export default defineConfig({
+  // 1. IMPORTANTE: Esto le dice a GitHub que la app está en la carpeta /RECETARIO/
+  base: '/RECETARIO/', 
+  
+  server: {
+    port: 3000,
+    host: '0.0.0.0',
+  },
+  
+  plugins: [react()],
+
+  // 2. SEGURIDAD: Eliminamos las referencias a API_KEY para que no haya cobros
+  define: {
+    'process.env': {} 
+  },
+
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, '.'),
+    }
+  }
 });
