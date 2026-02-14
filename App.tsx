@@ -6,7 +6,7 @@ import { Recipe, RecipeBook, UserSession } from './types.ts';
 import RecipePage from './components/RecipePage.tsx';
 import CoverPage from './components/CoverPage.tsx';
 
-const GOOGLE_CLIENT_ID = "634563853153-f7pgho436skv0v2p958e94h0be9pbtat.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "877559869801-mo7jt6tkjk6333mr31o94vkmlhemo2ta.apps.googleusercontent.com";
 
 const App: React.FC = () => {
   const [session, setSession] = useState<UserSession | null>(() => {
