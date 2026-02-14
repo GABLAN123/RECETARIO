@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { RECIPE_SCHEMA_PROMPT, enrichRecipeWithAutoTags } from './services/geminiService';
-import { loadLibraryFromDrive, saveLibraryToDrive } from './services/driveService';
-import { Recipe, RecipeBook, UserSession } from './types';
-import RecipePage from './components/RecipePage';
-import CoverPage from './components/CoverPage';
+import { RECIPE_SCHEMA_PROMPT, enrichRecipeWithAutoTags } from './services/geminiService.ts';
+import { loadLibraryFromDrive, saveLibraryToDrive } from './services/driveService.ts';
+import { Recipe, RecipeBook, UserSession } from './types.ts';
+import RecipePage from './components/RecipePage.tsx';
+import CoverPage from './components/CoverPage.tsx';
 
 const GOOGLE_CLIENT_ID = "634563853153-f7pgho436skv0v2p958e94h0be9pbtat.apps.googleusercontent.com";
 
@@ -26,20 +26,25 @@ const App: React.FC = () => {
   const tokenClient = useRef<any>(null);
 
   useEffect(() => {
-    if ((window as any).google) {
-      tokenClient.current = (window as any).google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: 'https://www.googleapis.com/auth/drive.file email profile',
-        callback: (response: any) => {
-          if (response.access_token) {
-            const newSession = { accessToken: response.access_token, email: "mi-cocina-ia@personal.com" };
-            setSession(newSession);
-            localStorage.setItem('kawaii_session_v4', JSON.stringify(newSession));
-            loadInitialData(response.access_token);
-          }
-        },
-      });
-    }
+    const checkGoogle = () => {
+      if ((window as any).google && (window as any).google.accounts) {
+        tokenClient.current = (window as any).google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: 'https://www.googleapis.com/auth/drive.file email profile',
+          callback: (response: any) => {
+            if (response.access_token) {
+              const newSession = { accessToken: response.access_token, email: "mi-cocina-ia@personal.com" };
+              setSession(newSession);
+              localStorage.setItem('kawaii_session_v4', JSON.stringify(newSession));
+              loadInitialData(response.access_token);
+            }
+          },
+        });
+      } else {
+        setTimeout(checkGoogle, 100);
+      }
+    };
+    checkGoogle();
   }, []);
 
   const loadInitialData = async (token: string) => {
@@ -88,7 +93,6 @@ const App: React.FC = () => {
   const handleManualImport = () => {
     try {
       const jsonStr = importJson.trim();
-      // Intentar limpiar el JSON si la IA devuelve markdown
       const cleaned = jsonStr.replace(/^```json/, '').replace(/```$/, '').trim();
       const recipes = JSON.parse(cleaned);
       
@@ -180,7 +184,6 @@ INSTRUCTION: Follow this exact structure and nutrition logic for any new generat
       <main className="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full">
         {view === 'library' ? (
           <div className="space-y-12 fade-in">
-            {/* Header de creación - Única opción Manual */}
             <div className="bg-white p-10 rounded-[4rem] shadow-2xl border-4 border-white relative overflow-hidden">
                <div className="absolute top-0 right-0 w-64 h-64 bg-pink-50/50 rounded-full -translate-y-1/2 translate-x-1/2 -z-10"></div>
                <h2 className="font-display text-3xl text-pink-700 mb-2">Crear Nuevo Recetario</h2>
@@ -202,7 +205,6 @@ INSTRUCTION: Follow this exact structure and nutrition logic for any new generat
                </div>
             </div>
 
-            {/* Biblioteca de Libros */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
               {library.length === 0 && (
                 <div className="col-span-full py-32 text-center border-4 border-dashed border-pink-50 rounded-[4rem]">
@@ -246,7 +248,6 @@ INSTRUCTION: Follow this exact structure and nutrition logic for any new generat
           </div>
         ) : (
           <div className="space-y-8 fade-in">
-            {/* Toolbar Editor */}
             <div className="no-print bg-white/90 backdrop-blur-xl p-5 rounded-[2.5rem] shadow-2xl border-4 border-white flex items-center justify-between sticky top-24 z-50">
                <button onClick={() => setView('library')} className="w-12 h-12 flex items-center justify-center bg-pink-50 text-pink-500 rounded-full hover:bg-pink-500 hover:text-white transition-all text-xl">←</button>
                <div className="text-center hidden sm:block">
@@ -262,7 +263,6 @@ INSTRUCTION: Follow this exact structure and nutrition logic for any new generat
             <div className="flex flex-col items-center gap-16 pb-32">
                <CoverPage title={currentBook?.title || ""} subtitle={currentBook?.subtitle || ""} recipes={currentBook?.recipes} />
                
-               {/* Índice Automático */}
                <div className="a5-page bg-white p-8">
                   <div className="h-full border-4 border-pink-50 rounded-[30px] p-8 flex flex-col">
                      <h2 className="font-display text-4xl text-pink-600 mb-10 border-b-4 border-pink-50 pb-4">Contenido</h2>
@@ -277,7 +277,7 @@ INSTRUCTION: Follow this exact structure and nutrition logic for any new generat
                      </div>
                      <footer className="text-center">
                         <div className="text-[10px] font-black text-pink-100 uppercase tracking-[0.8em] mb-2">My Cooking Cloud Studio</div>
-                        <div className="text-[10px] font-black text-pink-100 uppercase tracking-[0.3em]">Cero Costo • IA Manual</div>
+                        <div className="text-[10px] font-black text-pink-100 uppercase tracking-widest">Cero Costo • IA Manual</div>
                      </footer>
                   </div>
                </div>
@@ -289,15 +289,6 @@ INSTRUCTION: Follow this exact structure and nutrition logic for any new generat
           </div>
         )}
       </main>
-      
-      <footer className="no-print p-12 text-center">
-         <div className="flex items-center justify-center gap-4 mb-4 opacity-30">
-            <div className="w-10 h-px bg-pink-200"></div>
-            <span className="text-xl">🍰</span>
-            <div className="w-10 h-px bg-pink-200"></div>
-         </div>
-         <p className="text-pink-200 text-[10px] font-black uppercase tracking-[0.5em]">Tu Recetario Inteligente Sin Mantenimiento</p>
-      </footer>
     </div>
   );
 };
