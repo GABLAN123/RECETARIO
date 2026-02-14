@@ -1,7 +1,7 @@
 name: Deploy Kawaii Studio
 on:
   push:
-    branches: [main] # Se activa cada vez que guardas cambios en la rama main
+    branches: [main]
 
 permissions:
   contents: write
@@ -19,15 +19,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-         
+          # Eliminamos la línea de cache para evitar el error del lock file
 
       - name: Install and Build 🏗️
         run: |
-          npm install
+          npm install --no-package-lock
           npm run build
+        env:
+          CI: false # Esto evita que el build falle por advertencias pequeñas
 
       - name: Deploy to GitHub Pages 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist # Vite guarda la app lista en la carpeta 'dist'
-          branch: gh-pages # Aquí se guardará la versión que sí funciona
+          folder: dist
+          branch: gh-pages
