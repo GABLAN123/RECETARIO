@@ -1,0 +1,17 @@
+
+{
+  "short_name": "RecipeStudio",
+  "name": "Kawaii Recipe Studio IA",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#fff9fb",
+  "background_color": "#fff9fb"
+}

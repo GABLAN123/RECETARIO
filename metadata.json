@@ -1,0 +1,8 @@
+
+{
+  "name": "Kawaii Recipe Studio (Manual Edition)",
+  "description": "Crea recetarios profesionales en formato ebook sin gastar en APIs. Usa el Prompt Builder, copia a tu IA favorita e importa el JSON. Sincronizado con Google Drive.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
